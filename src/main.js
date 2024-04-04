@@ -8,6 +8,8 @@ import iziToast from "izitoast";
 // Додатковий імпорт стилів
 import "izitoast/dist/css/iziToast.min.css";
 
+
+
 const gallery = new SimpleLightbox('.gallery a',{
     overlayOpacity: 8,
     captionData: "href",
@@ -27,6 +29,8 @@ function handleSubmit(event) {
     event.preventDefault();
     const input = form.querySelector("input[type='text']");
     const searchQuery = input.value;
+
+    loader.style.display = 'flex';
    
     searchPictures(searchQuery)       
     .then(data => {
@@ -44,7 +48,8 @@ if (hits.length === 0) {
             showToast(errorMsg)
         })
     
-    .finally(()=> form.reset())
+    .finally(()=> { loader.style.display = 'none';
+    form.reset()})
     }
 
 const  API_KEY = "43197174-dcc5f5044572d8f441379a766";
@@ -106,21 +111,8 @@ function showToast(message) {
     
 };
 
-// Css loader---------------------------------------------------------------
-const path = require('path');
 
-module.exports = {
-    entry: './src/index.js',
-    output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-    },
-    module: {
-        rules: [
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
-            },
-        ],
-    },
-};
+const loader = document.getElementById('loader');
+
+
+
