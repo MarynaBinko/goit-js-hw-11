@@ -23,18 +23,18 @@ form.addEventListener("submit", handleSubmit);
  
 
 
-
 function handleSubmit(event) {
     event.preventDefault();
     const input = form.querySelector("input[type='text']");
     const searchQuery = input.value;
-    console.log(searchQuery);  
-    searchPictures(searchQuery)
+   
+    searchPictures(searchQuery)       
     .then(data => {
-        container.innerHTML = createMarkup(data);
+        const hits = data.hits;
+        container.innerHTML = createMarkup(hits);
         gallery.refresh();
     })
-    .catch(errorMsg => showToast(errorMsg))
+    .catch(error => showToast(error.errorMsg))
     .finally(()=> form.reset())
 }
 
@@ -43,16 +43,16 @@ const  API_KEY = "43197174-dcc5f5044572d8f441379a766";
 function searchPictures(searchQuery){
     const params = new URLSearchParams({
         key: API_KEY,
-        q: "searchQuery",
+        q: searchQuery,
         image_type: "photo",
         orientation: "horizontal",
         safesearch: true,
     });
-    
+ 
     return fetch(`https://pixabay.com/api/?${params}`)
     .then(response => {
         if(!response.ok){
-            throw new Error(showToast(errorMsg));
+            throw new Error("Sorry, there are no images matching your search query. Please try again!");
         }
         return response.json()
     })
@@ -62,33 +62,31 @@ function searchPictures(searchQuery){
 
 function createMarkup(arr) {
     return arr 
-    .map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>{`
+    .map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>{
+        return `
     <ul class="list">
         <li class="list-item">
         <a class="gallery-link" href="${largeImageURL}">
-            <img src="${webformatURL}" alt="${tags}">
+            <img  class="list-image" src="${webformatURL}" alt="${tags}">
             <div class="image-details">          
-                <h2 class="likes">Likes: ${likes} </h2>
-                <h2 class="views">Views: ${views}  </h2>                                
-                <h2 class="comments">Comments: ${comments}</h2>               
-                <h2 class="downloads">Downloads: ${downloads}</h2>                           
+                <p class="likes"><span class="span">Likes:</span><br> <span class="span-link">${likes}</span> </p>
+                <p class="views"><span class="span">Views:</span><br> <span class="span-link">${views}</span>  </p>                                
+                <p class="comments"><span class="span">Comments:</span><br> <span class="span-link">${comments}</span></p>               
+                <p class="downloads"><span class="span">Downloads:</span><br> <span class="span-link">${downloads}</span></p>                           
             </div>
         </li>
-    </ul>  `})
+    </ul>`; })
     .join("")
 }
 
 
 
 
-
-
 let toastBox = document.getElementById(`toastBox`);
 const errorMsg = `<i class="fa-solid fa-xmark"></i>Sorry, there are no images matching your search query. Please try again!`;
-function showToast(message, className) {
+function showToast(message) {
     let toast = document.createElement(`div`);
-    toast.classList.add(`toast`);
-    toast.classList.add(className);
+    toast.classList.add(`toast`);   
     toast.innerHTML = message;
 
     toastBox.appendChild(toast);
@@ -96,25 +94,25 @@ function showToast(message, className) {
     
     setTimeout(() => {
         toast.remove();
-    }, 6000);
+    }, 5000);
     
 };
 
 // Css loader---------------------------------------------------------------
-// const path = require('path');
+const path = require('path');
 
-// module.exports = {
-//     entry: './src/index.js',
-//     output: {
-//         filename: 'bundle.js',
-//         path: path.resolve(__dirname, 'dist'),
-//     },
-//     module: {
-//         rules: [
-//             {
-//                 test: /\.css$/,
-//                 use: ['style-loader', 'css-loader'],
-//             },
-//         ],
-//     },
-// };
+module.exports = {
+    entry: './src/index.js',
+    output: {
+        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'dist'),
+    },
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader'],
+            },
+        ],
+    },
+};
