@@ -31,12 +31,21 @@ function handleSubmit(event) {
     searchPictures(searchQuery)       
     .then(data => {
         const hits = data.hits;
-        container.innerHTML = createMarkup(hits);
-        gallery.refresh();
+if (hits.length === 0) {
+    const errorMsg = `<i class="fa-solid fa-xmark"></i>Sorry, there are no images matching your search query. Please try again!`;
+    showToast(errorMsg);
+}else{ 
+    container.innerHTML = createMarkup(hits);
+    gallery.refresh();}
+       
     })
-    .catch(error => showToast(error.errorMsg))
+    .catch(error => {
+            const errorMsg = `<i class="fa-solid fa-xmark"></i>Sorry, there are no images matching your search query. Please try again!`;
+            showToast(errorMsg)
+        })
+    
     .finally(()=> form.reset())
-}
+    }
 
 const  API_KEY = "43197174-dcc5f5044572d8f441379a766";
 
@@ -52,7 +61,7 @@ function searchPictures(searchQuery){
     return fetch(`https://pixabay.com/api/?${params}`)
     .then(response => {
         if(!response.ok){
-            throw new Error("Sorry, there are no images matching your search query. Please try again!");
+            throw new Error(showToast(errorMsg));
         }
         return response.json()
     })
@@ -83,7 +92,6 @@ function createMarkup(arr) {
 
 
 let toastBox = document.getElementById(`toastBox`);
-const errorMsg = `<i class="fa-solid fa-xmark"></i>Sorry, there are no images matching your search query. Please try again!`;
 function showToast(message) {
     let toast = document.createElement(`div`);
     toast.classList.add(`toast`);   
@@ -94,7 +102,7 @@ function showToast(message) {
     
     setTimeout(() => {
         toast.remove();
-    }, 5000);
+    }, 3000);
     
 };
 
