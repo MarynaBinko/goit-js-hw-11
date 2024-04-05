@@ -27,10 +27,12 @@ form.addEventListener("submit", handleSubmit);
 
 function handleSubmit(event) {
     event.preventDefault();
+    
     const input = form.querySelector("input[type='text']");
     const searchQuery = input.value;
 
     loader.style.display = 'flex';
+    container.innerHTML = "";
    
     searchPictures(searchQuery)       
     .then(data => {
@@ -75,10 +77,8 @@ function searchPictures(searchQuery){
 
 
 function createMarkup(arr) {
-    return arr 
-    .map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>{
-        return `
-    <ul class="list">
+    return  arr.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads}) =>{
+        return `   
         <li class="list-item">
         <a class="gallery-link" href="${largeImageURL}">
             <img  class="list-image" src="${webformatURL}" alt="${tags}">
@@ -88,9 +88,9 @@ function createMarkup(arr) {
                 <p class="comments"><span class="span">Comments:</span><br> <span class="span-link">${comments}</span></p>               
                 <p class="downloads"><span class="span">Downloads:</span><br> <span class="span-link">${downloads}</span></p>                           
             </div>
-        </li>
-    </ul>`; })
+        </li>`; })
     .join("")
+    ;
 }
 
 
